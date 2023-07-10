@@ -12,7 +12,6 @@ if [ $dir == "build" ]; then
     mkdir build
     cd build
     cmake ..
-    make
 else
     # check if there is a CMakeLists.txt file
     if [ -f "CMakeLists.txt" ]; then
@@ -23,14 +22,12 @@ else
             mkdir build
             cd build
             cmake ..
-            make
         else
             # make new build folder
             echo "making build directory"
             mkdir build
             cd build
             cmake ..
-            make
         fi
     fi
 fi
