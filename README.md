@@ -9,7 +9,7 @@ cd rebuild
 chmod +x rebuild.sh
 sudo mv rebuild.sh /bin/
 
-echo "alias rebuild='/bin/rebuild.sh'" >> ~/.bashrc
+echo "alias rebuild='source /bin/rebuild.sh'" >> ~/.bashrc
 source ~/.bashrc
 ```
 ### Use
