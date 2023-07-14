@@ -16,6 +16,24 @@ function new_build {
     cp ../CMakeLists.txt rebuildcache.txt
 }
 
+function new_build_debug {
+    # check if there is a build directory, and remove it if it exists
+    if [ -d "build" ]; then
+        rm -r build
+    fi
+    # insert "set(CMAKE_BUILD_TYPE Debug)" into the 4th line of CMakeLists.txt
+    sed -i '4iset(CMAKE_BUILD_TYPE Debug)' CMakeLists.txt
+    # create a new build directory and cd into it
+    mkdir build
+    cd build
+    # run cmake and make
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
+    make $make_args
+    cp ../CMakeLists.txt rebuildcache.txt
+    # remove the line we added
+    sed -i '4d' ../CMakeLists.txt
+}
+
 # get the name of current directory
 dir=${PWD##*/}   
 
@@ -26,17 +44,16 @@ if [[ $@ =~ -j[0-9]+ ]]; then
 else
     make_args=""
 fi
-# look for -d for debug flag
-if [[ $@ =~ -d ]]; then
-    debug_flag="-DCMAKE_BUILD_TYPE=Debug"
-else
-    debug_flag=""
-fi
-
-
 
 # check if the script is run in build the rebuild
 if [ $dir == "build" ]; then
+    # check debug flag
+    if [[ $@ =~ -d ]]; then
+        cd ..
+        new_build_debug
+        # exit the script
+        exit 0
+    fi
     # check if there is a rebuildcache.txt file
     if [ -f "rebuildcache.txt" ]; then
         # check if ../CMakeLists.txt matches rebuildcache.txt
@@ -57,7 +74,12 @@ if [ $dir == "build" ]; then
 else
     # check if there is a CMakeLists.txt file
     if [ -f "CMakeLists.txt" ]; then
-        new_build
+        # check if the debug flag is set
+        if [[ $@ =~ -d ]]; then
+            new_build_debug
+        else
+            new_build
+        fi
     else
         echo "[ERROR] No CMakeLists.txt file found in current directory"
     fi
